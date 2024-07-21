@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="styles.css" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
+    <title>Robot Control Interface</title>
+</head>
+<body>
+
+<div id="header">
+    <h1>Robot Control Interface</h1>
+</div>
+
+<div id="main-container">
+    <div id="left-panel">
+        <div id="button-container">
+            <button id="connect" type="button" class="btn">Connect</button>
+            <button id="disconnect" type="button" class="btn">Disconnect</button>
+        </div>
+        <input id="command-input" type="text" placeholder="Type command" maxlength="1" class="input">
+    </div>
+
+    <div id="right-panel">
+        <div id="distance-container">
+            Distance: <span id="distance">0</span> cm
+        </div>
+        <div id="terminal-container">
+            <div id="terminal"></div>
+        </div>
+    </div>
+</div>
+
+<script src="main.js"></script>
+<script src="companion.js" data-service-worker="sw.js"></script>
+
+</body>
+</html>
