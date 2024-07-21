@@ -4,8 +4,19 @@ let disconnectButton = document.getElementById('disconnect');
 let terminalContainer = document.getElementById('terminal');
 let distanceDisplay = document.getElementById('distance');
 
-// State to track keys
+// State to track keys and command timing
 let keyState = {};
+let lastCommandTime = 0;
+const COMMAND_DELAY = 50; // Minimum delay between commands in milliseconds
+
+// Device cache object
+let deviceCache = null;
+
+// Characteristic cache object
+let characteristicCache = null;
+
+// Buffer for incoming data
+let readBuffer = '';
 
 // Connect to device on Connect button click
 connectButton.addEventListener('click', function() {
@@ -18,28 +29,39 @@ disconnectButton.addEventListener('click', function() {
 });
 
 // Handle keydown and keyup events
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', handleKeyDown);
+document.addEventListener('keyup', handleKeyUp);
+
+function handleKeyDown(event) {
   if (['w', 'a', 's', 'd'].includes(event.key) && !keyState[event.key]) {
     keyState[event.key] = true;
-    send(`${event.key} pressed`);
+    sendCommand(`${event.key} pressed`);
   }
-});
+}
 
-document.addEventListener('keyup', function(event) {
+function handleKeyUp(event) {
   if (['w', 'a', 's', 'd'].includes(event.key)) {
     keyState[event.key] = false;
-    send(`${event.key} released`);
+    sendCommand(`${event.key} released`);
   }
-});
+}
 
-// Device cache object
-let deviceCache = null;
+function sendCommand(command) {
+  const now = Date.now();
+  if (now - lastCommandTime >= COMMAND_DELAY) {
+    send(command);
+    lastCommandTime = now;
+  }
+}
 
-// Characteristic cache object
-let characteristicCache = null;
-
-// Buffer for incoming data
-let readBuffer = '';
+// Add a periodic check to ensure no stuck commands
+setInterval(() => {
+  for (let key of ['w', 'a', 's', 'd']) {
+    if (!keyState[key]) {
+      sendCommand(`${key} released`);
+    }
+  }
+}, 1000); // Check every second
 
 // Start selecting Bluetooth device and connect to it
 function connect() {
@@ -202,7 +224,7 @@ function send(data) {
     for (let i = 1; i < chunks.length; i++) {
       setTimeout(() => {
         writeToCharacteristic(characteristicCache, chunks[i]);
-      }, i * 100);
+      }, i * 20); // Reduced delay between chunks
     }
   }
   else {
